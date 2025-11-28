@@ -4,10 +4,17 @@ const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 
-const worldState = require('./worldState');
-const { initAgents, setLogSender } = require('./agents/initAgents');
+// Database
+const { connectDB, getConnectionStatus } = require('./config/database');
+
+// Routes
+const worldState = require('./worldState'); // Keep for now as fallback
+const { initAgents, setLogSender } = require('./agents/initAgents_DB'); // Use MongoDB version
 const stateRoutes = require('./routes/stateRoutes');
-const { attachIO, getLogs, sendLog } = require('./logger'); // ✅ use logger.js
+const authRoutes = require('./routes/authRoutes');
+const entityRoutes = require('./routes/entityRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+const { attachIO, getLogs, sendLog } = require('./logger');
 
 const app = express();
 app.use(cors());
@@ -27,12 +34,24 @@ attachIO(io);
 // ✅ give agents the logger's sendLog function
 setLogSender(sendLog);
 
-// ✅ REST routes (pass worldState + getLogs function + sendLog for scenario triggers)
-app.use('/api', stateRoutes(worldState, getLogs, sendLog));
+// ✅ REST routes
+app.use('/api/auth', authRoutes); // Authentication & Registration
+app.use('/api/entities', entityRoutes); // Entity management
+app.use('/api/analytics', analyticsRoutes); // Analytics & Heatmap
+app.use('/api', stateRoutes(worldState, getLogs, sendLog)); // Legacy state routes
 
 // Basic health check
 app.get('/', (req, res) => {
   res.send('HealSync backend is running');
+});
+
+// Health check with database status
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'running',
+    database: getConnectionStatus() ? 'connected' : 'disconnected',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Socket.io connection handling
@@ -41,10 +60,26 @@ io.on('connection', (socket) => {
   socket.emit('connected', { msg: 'Connected to HealSync backend' });
 });
 
-// Start agents (they will run in intervals)
-initAgents(worldState);
+// Start server and initialize agents
+const PORT = process.env.PORT || 4000;
 
-const PORT = 4000;
-server.listen(PORT, () => {
-  console.log(`Backend server listening on port ${PORT}`);
+async function startServer() {
+  // Wait for database to connect
+  await connectDB();
+  
+  // Start agents (they will run in intervals)
+  console.log('🚀 Initializing AI agents...');
+  await initAgents();
+  
+  // Start HTTP server
+  server.listen(PORT, () => {
+    console.log(`✅ Backend server listening on port ${PORT}`);
+    console.log(`📊 Database: ${getConnectionStatus() ? 'Connected' : 'Fallback Mode'}`);
+    console.log(`🤖 Agents: Running`);
+  });
+}
+
+startServer().catch(error => {
+  console.error('❌ Failed to start server:', error);
+  process.exit(1);
 });

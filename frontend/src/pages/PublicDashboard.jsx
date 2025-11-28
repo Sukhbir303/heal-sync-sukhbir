@@ -39,13 +39,21 @@ function PublicDashboard() {
             <p className="text-sm text-slate-400">Public Health Dashboard</p>
           </div>
           
-          {/* Login button */}
-          <button
-            onClick={() => setShowLoginModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
-          >
-            🔐 Professional Login
-          </button>
+          {/* Login and Register buttons */}
+          <div className="flex gap-3">
+            <a
+              href="/register"
+              className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
+            >
+              ✨ Register Entity
+            </a>
+            <button
+              onClick={() => setShowLoginModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
+            >
+              🔐 Professional Login
+            </button>
+          </div>
         </div>
       </header>
 
