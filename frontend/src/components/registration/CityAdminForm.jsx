@@ -6,6 +6,7 @@ function CityAdminForm({ onSubmit, loading }) {
     departmentName: '',
     address: '',
     phone: '',
+    email: '',
     adminName: '',
     designation: '',
     adminEmail: '',
@@ -22,8 +23,13 @@ function CityAdminForm({ onSubmit, loading }) {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.departmentName) newErrors.departmentName = 'Department name is required';
-    if (!formData.adminEmail) newErrors.adminEmail = 'Email is required';
+    if (!formData.address) newErrors.address = 'Address is required';
+    if (!formData.phone) newErrors.phone = 'Phone is required';
+    if (!formData.email) newErrors.email = 'Department email is required';
+    if (!formData.adminName) newErrors.adminName = 'Official name is required';
+    if (!formData.adminEmail) newErrors.adminEmail = 'Official email is required';
     if (!formData.password) newErrors.password = 'Password is required';
+    if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
@@ -38,7 +44,7 @@ function CityAdminForm({ onSubmit, loading }) {
     const entityData = {
       entityType: 'cityadmin',
       name: formData.departmentName,
-      email: formData.adminEmail,
+      email: formData.email,
       phone: formData.phone,
       zone: 'City-Wide',
       address: formData.address,
@@ -96,7 +102,7 @@ function CityAdminForm({ onSubmit, loading }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Contact Phone</label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Contact Phone *</label>
             <input
               type="tel"
               name="phone"
@@ -104,6 +110,20 @@ function CityAdminForm({ onSubmit, loading }) {
               onChange={handleChange}
               className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
             />
+            {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Department Email *</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+              placeholder="health@mumbai.gov.in"
+            />
+            {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
           </div>
         </div>
       </div>

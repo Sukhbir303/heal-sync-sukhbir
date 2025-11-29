@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { io } from 'socket.io-client';
 
 function PharmacyDashboard() {
-  const { pharmacyId } = useParams();
+  const { pharmacyId: urlPharmacyId } = useParams();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [pharmacyData, setPharmacyData] = useState(null);
@@ -13,15 +13,27 @@ function PharmacyDashboard() {
   const [alerts, setAlerts] = useState([]);
   const [coordinationMessages, setCoordinationMessages] = useState([]);
 
+  const pharmacyId = user?.entityId || urlPharmacyId;
+
+  useEffect(() => {
+    if (!user) navigate('/');
+  }, [user, navigate]);
+
   // Fetch pharmacy data
   useEffect(() => {
+    if (!pharmacyId) return;
+
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:4000/api/state');
-        const data = await res.json();
-        const pharmacy = data.pharmacies?.[pharmacyId];
-        if (pharmacy) {
-          setPharmacyData({ ...pharmacy, id: pharmacyId });
+        if (pharmacyId.length === 24) {
+          const res = await fetch(`http://localhost:4000/api/entities/${pharmacyId}`);
+          const data = await res.json();
+          if (data.success) setPharmacyData({ ...data.data, id: pharmacyId });
+        } else {
+          const res = await fetch('http://localhost:4000/api/state');
+          const data = await res.json();
+          const pharmacy = data.pharmacies?.[pharmacyId];
+          if (pharmacy) setPharmacyData({ ...pharmacy, id: pharmacyId });
         }
       } catch (err) {
         console.error('Error fetching pharmacy data:', err);

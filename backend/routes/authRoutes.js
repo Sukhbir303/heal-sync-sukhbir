@@ -91,9 +91,31 @@ router.post('/register', async (req, res) => {
 
   } catch (error) {
     console.error('Registration error:', error);
+    
+    // Handle duplicate key error (email already exists)
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      const value = error.keyValue ? error.keyValue[field] : 'this value';
+      return res.status(400).json({ 
+        success: false, 
+        message: `A ${field || 'record'} with ${value} already exists. Please use a different ${field || 'value'}.`,
+        error: 'DUPLICATE_KEY'
+      });
+    }
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({ 
+        success: false, 
+        message: messages.join(', '),
+        error: 'VALIDATION_ERROR'
+      });
+    }
+    
     res.status(500).json({ 
       success: false, 
-      message: 'Registration failed', 
+      message: error.message || 'Registration failed. Please try again.', 
       error: error.message 
     });
   }

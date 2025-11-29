@@ -8,6 +8,7 @@ function SupplierForm({ onSubmit, loading }) {
     address: '',
     coordinates: { lat: 19.076, lng: 72.877 },
     phone: '',
+    email: '',
     adminName: '',
     adminEmail: '',
     password: '',
@@ -23,8 +24,13 @@ function SupplierForm({ onSubmit, loading }) {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name) newErrors.name = 'Supplier name is required';
-    if (!formData.adminEmail) newErrors.adminEmail = 'Email is required';
+    if (!formData.address) newErrors.address = 'Address is required';
+    if (!formData.phone) newErrors.phone = 'Phone is required';
+    if (!formData.email) newErrors.email = 'Company email is required';
+    if (!formData.adminName) newErrors.adminName = 'Admin name is required';
+    if (!formData.adminEmail) newErrors.adminEmail = 'Admin email is required';
     if (!formData.password) newErrors.password = 'Password is required';
+    if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
@@ -39,7 +45,7 @@ function SupplierForm({ onSubmit, loading }) {
     const entityData = {
       entityType: 'supplier',
       name: formData.name,
-      email: formData.adminEmail,
+      email: formData.email,
       phone: formData.phone,
       zone: 'Multi-Zone', // Suppliers can serve multiple zones
       address: formData.address,
@@ -92,6 +98,20 @@ function SupplierForm({ onSubmit, loading }) {
               onChange={handleChange}
               className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
             />
+            {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Company Email *</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:border-blue-500 focus:outline-none"
+              placeholder="supplier@example.com"
+            />
+            {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
           </div>
 
           <div className="md:col-span-2">

@@ -11,19 +11,31 @@ const AgentActivitySchema = new mongoose.Schema({
   agentType: {
     type: String,
     required: true,
-    enum: ['Hospital', 'Lab', 'Pharmacy', 'Supplier', 'City']
+    enum: ['Hospital', 'Lab', 'Pharmacy', 'Supplier', 'City', 'System', 'hospital', 'lab', 'pharmacy', 'supplier', 'city', 'cityadmin', 'system']
   },
   entityId: {
     type: String,
     index: true
   },
+  entityName: {
+    type: String,
+    required: false
+  },
+  activityType: {
+    type: String,
+    required: false
+  },
   action: {
     type: String,
-    required: true
+    required: false
+  },
+  description: {
+    type: String,
+    required: false
   },
   message: {
     type: String,
-    required: true
+    required: false
   },
   metadata: {
     type: mongoose.Schema.Types.Mixed,

@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { io } from 'socket.io-client';
 
 function SupplierDashboard() {
-  const { supplierId } = useParams();
+  const { supplierId: urlSupplierId } = useParams();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [supplierData, setSupplierData] = useState(null);
@@ -13,15 +13,27 @@ function SupplierDashboard() {
   const [alerts, setAlerts] = useState([]);
   const [coordinationMessages, setCoordinationMessages] = useState([]);
 
+  const supplierId = user?.entityId || urlSupplierId;
+
+  useEffect(() => {
+    if (!user) navigate('/');
+  }, [user, navigate]);
+
   // Fetch supplier data
   useEffect(() => {
+    if (!supplierId) return;
+
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:4000/api/state');
-        const data = await res.json();
-        const supplier = data.suppliers?.[supplierId];
-        if (supplier) {
-          setSupplierData({ ...supplier, id: supplierId });
+        if (supplierId.length === 24) {
+          const res = await fetch(`http://localhost:4000/api/entities/${supplierId}`);
+          const data = await res.json();
+          if (data.success) setSupplierData({ ...data.data, id: supplierId });
+        } else {
+          const res = await fetch('http://localhost:4000/api/state');
+          const data = await res.json();
+          const supplier = data.suppliers?.[supplierId];
+          if (supplier) setSupplierData({ ...supplier, id: supplierId });
         }
       } catch (err) {
         console.error('Error fetching supplier data:', err);

@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { io } from 'socket.io-client';
 
 function LabDashboard() {
-  const { labId } = useParams();
+  const { labId: urlLabId } = useParams();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [labData, setLabData] = useState(null);
@@ -13,15 +13,27 @@ function LabDashboard() {
   const [alerts, setAlerts] = useState([]);
   const [coordinationMessages, setCoordinationMessages] = useState([]);
 
+  const labId = user?.entityId || urlLabId;
+
+  useEffect(() => {
+    if (!user) navigate('/');
+  }, [user, navigate]);
+
   // Fetch lab data
   useEffect(() => {
+    if (!labId) return;
+
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:4000/api/state');
-        const data = await res.json();
-        const lab = data.labs?.[labId];
-        if (lab) {
-          setLabData({ ...lab, id: labId });
+        if (labId.length === 24) {
+          const res = await fetch(`http://localhost:4000/api/entities/${labId}`);
+          const data = await res.json();
+          if (data.success) setLabData({ ...data.data, id: labId });
+        } else {
+          const res = await fetch('http://localhost:4000/api/state');
+          const data = await res.json();
+          const lab = data.labs?.[labId];
+          if (lab) setLabData({ ...lab, id: labId });
         }
       } catch (err) {
         console.error('Error fetching lab data:', err);

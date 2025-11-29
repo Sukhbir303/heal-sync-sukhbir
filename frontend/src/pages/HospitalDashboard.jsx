@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { io } from 'socket.io-client';
 
 function HospitalDashboard() {
-  const { hospitalId } = useParams();
+  const { hospitalId: urlHospitalId } = useParams();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [hospitalData, setHospitalData] = useState(null);
@@ -13,15 +13,37 @@ function HospitalDashboard() {
   const [alerts, setAlerts] = useState([]);
   const [coordinationMessages, setCoordinationMessages] = useState([]);
 
-  // Fetch hospital data
+  // Get hospital ID from user context or URL params
+  const hospitalId = user?.entityId || urlHospitalId;
+
+  // Redirect to login if not authenticated
   useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
+  // Fetch hospital data using MongoDB entity ID
+  useEffect(() => {
+    if (!hospitalId) return;
+
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:4000/api/state');
-        const data = await res.json();
-        const hospital = data.hospitals?.[hospitalId];
-        if (hospital) {
-          setHospitalData({ ...hospital, id: hospitalId });
+        // If we have a MongoDB ObjectId (from registration), fetch directly
+        if (hospitalId.length === 24) {
+          const res = await fetch(`http://localhost:4000/api/entities/${hospitalId}`);
+          const data = await res.json();
+          if (data.success) {
+            setHospitalData({ ...data.data, id: hospitalId });
+          }
+        } else {
+          // Legacy: fetch from world state
+          const res = await fetch('http://localhost:4000/api/state');
+          const data = await res.json();
+          const hospital = data.hospitals?.[hospitalId];
+          if (hospital) {
+            setHospitalData({ ...hospital, id: hospitalId });
+          }
         }
       } catch (err) {
         console.error('Error fetching hospital data:', err);

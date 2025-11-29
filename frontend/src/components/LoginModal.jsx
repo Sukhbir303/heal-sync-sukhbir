@@ -8,7 +8,7 @@ function LoginModal({ isOpen, onClose }) {
   const [selectedEntity, setSelectedEntity] = useState('');
   const [entities, setEntities] = useState([]);
   const [worldState, setWorldState] = useState(null);
-  const { login } = useAuth();
+  const { loginLegacy } = useAuth();
   const navigate = useNavigate();
 
   // Fetch world state to get available entities
@@ -84,7 +84,7 @@ function LoginModal({ isOpen, onClose }) {
     const entity = entities.find(e => e.id === entityId);
     const entityName = entity ? entity.name : 'Unknown';
 
-    login(selectedRole, entityId, entityName);
+    loginLegacy(selectedRole, entityId, entityName);
 
     // Navigate to appropriate dashboard
     if (selectedRole === 'city') {

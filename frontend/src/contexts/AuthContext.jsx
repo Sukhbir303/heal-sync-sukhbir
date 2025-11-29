@@ -29,10 +29,25 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  const login = (role, entityId, entityName) => {
+  const login = (userData, token) => {
+    // userData should have: role, email, name, id
+    // Store both user data and token
+    const userWithMeta = {
+      ...userData,
+      loginTime: new Date().toISOString()
+    };
+    setUser(userWithMeta);
+    localStorage.setItem('healsync_user', JSON.stringify(userWithMeta));
+    if (token) {
+      localStorage.setItem('healsync_token', token);
+    }
+  };
+  
+  // Legacy login for backward compatibility with demo login
+  const loginLegacy = (role, entityId, entityName) => {
     const userData = {
-      role, // 'hospital', 'lab', 'pharmacy', 'supplier', 'city'
-      entityId, // 'H1', 'L1', 'P1', etc.
+      role,
+      entityId,
       entityName,
       loginTime: new Date().toISOString()
     };
@@ -49,6 +64,7 @@ export const AuthProvider = ({ children }) => {
     user,
     isLoading,
     login,
+    loginLegacy,
     logout,
     isAuthenticated: !!user
   };

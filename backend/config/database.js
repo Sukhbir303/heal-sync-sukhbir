@@ -1,7 +1,8 @@
 // backend/config/database.js
 const mongoose = require('mongoose');
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/healsync';
+// Use local MongoDB for development speed
+const MONGODB_URI = 'mongodb://localhost:27017/healsync';
 
 let isConnected = false;
 

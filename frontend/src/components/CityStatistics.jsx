@@ -1,5 +1,8 @@
 // frontend/src/components/CityStatistics.jsx
-function CityStatistics({ cityData }) {
+function CityStatistics({ data }) {
+  // Handle both 'data' and 'cityData' props for backward compatibility
+  const cityData = data || {};
+  
   if (!cityData || !cityData.city) {
     return null;
   }

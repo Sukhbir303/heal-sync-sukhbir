@@ -15,7 +15,12 @@ const stateRoutes = require('./routes/stateRoutes');
 const authRoutes = require('./routes/authRoutes');
 const entityRoutes = require('./routes/entityRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const scenarioRoutes = require('./routes/scenarioRoutes');
+const activityRoutes = require('./routes/activityRoutes');
 const { attachIO, getLogs, sendLog } = require('./logger');
+
+// Services
+const diseaseSimulator = require('./services/diseaseSimulator');
 
 const app = express();
 app.use(cors());
@@ -40,6 +45,8 @@ app.use('/api/auth', authRoutes); // Authentication & Registration
 app.use('/api/entities', entityRoutes); // Entity management
 app.use('/api/analytics', analyticsRoutes); // Analytics & Heatmap
 app.use('/api', stateRoutes(null, getLogs, sendLog)); // State routes (MongoDB-powered)
+app.use('/api', scenarioRoutes(sendLog)); // Scenario management
+app.use('/api', activityRoutes()); // Activity & Alert tracking
 
 // Basic health check
 app.get('/', (req, res) => {
@@ -65,18 +72,34 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 4000;
 
 async function startServer() {
-  // Wait for database to connect
+  // Try to connect to database (non-blocking)
   await connectDB();
   
   // Start agents (they will run in intervals)
   console.log('🚀 Initializing AI agents...');
-  await initAgents();
+  try {
+    await initAgents();
+  } catch (error) {
+    console.error('⚠️  Agent initialization error:', error.message);
+    console.log('ℹ️  Server will continue without agents');
+  }
+  
+  // Start disease simulator for dynamic data (only if DB connected)
+  if (getConnectionStatus()) {
+    console.log('🦠 Starting Disease Simulator...');
+    try {
+      await diseaseSimulator.start();
+    } catch (error) {
+      console.error('⚠️  Disease simulator error:', error.message);
+    }
+  }
   
   // Start HTTP server with error handling
   server.listen(PORT, () => {
     console.log(`✅ Backend server listening on port ${PORT}`);
     console.log(`📊 Database: ${getConnectionStatus() ? 'Connected' : 'Fallback Mode'}`);
-    console.log(`🤖 Agents: Running`);
+    console.log(`🤖 Agents: ${getConnectionStatus() ? 'Running' : 'Offline'}`);
+    console.log(`🦠 Disease Simulator: ${getConnectionStatus() ? 'Active' : 'Offline'}`);
   });
 
   // Handle port already in use error
@@ -99,3 +122,5 @@ startServer().catch(error => {
   console.error('❌ Failed to start server:', error);
   process.exit(1);
 });
+
+

@@ -3,11 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import PublicDashboard from './pages/PublicDashboard';
 import RegistrationPage from './pages/RegistrationPage';
-import CityDashboard from './pages/CityDashboard';
-import HospitalDashboard from './pages/HospitalDashboard';
-import PharmacyDashboard from './pages/PharmacyDashboard';
-import LabDashboard from './pages/LabDashboard';
-import SupplierDashboard from './pages/SupplierDashboard';
+import CityCommandCenter from './pages/CityCommandCenter';
+import UnifiedHospitalDashboard from './pages/UnifiedHospitalDashboard';
+import UnifiedPharmacyDashboard from './pages/UnifiedPharmacyDashboard';
+import UnifiedLabDashboard from './pages/UnifiedLabDashboard';
+import UnifiedSupplierDashboard from './pages/UnifiedSupplierDashboard';
 
 function App() {
   return (
@@ -21,20 +21,20 @@ function App() {
           <Route path="/register" element={<RegistrationPage />} />
           
           {/* City Command Center - for professionals/demo */}
-          <Route path="/city-dashboard" element={<CityDashboard />} />
+          <Route path="/city-dashboard" element={<CityCommandCenter />} />
           
-          {/* Role-specific dashboards */}
-          <Route path="/hospital-dashboard" element={<HospitalDashboard />} />
-          <Route path="/lab-dashboard" element={<LabDashboard />} />
-          <Route path="/pharmacy-dashboard" element={<PharmacyDashboard />} />
-          <Route path="/supplier-dashboard" element={<SupplierDashboard />} />
+          {/* Role-specific dashboards (NEW REGISTRATION FLOW) */}
+          <Route path="/hospital-dashboard" element={<UnifiedHospitalDashboard />} />
+          <Route path="/lab-dashboard" element={<UnifiedLabDashboard />} />
+          <Route path="/pharmacy-dashboard" element={<UnifiedPharmacyDashboard />} />
+          <Route path="/supplier-dashboard" element={<UnifiedSupplierDashboard />} />
           
-          {/* Legacy routes with IDs (keep for backward compatibility) */}
-          <Route path="/city" element={<CityDashboard />} />
-          <Route path="/hospital/:hospitalId" element={<HospitalDashboard />} />
-          <Route path="/lab/:labId" element={<LabDashboard />} />
-          <Route path="/pharmacy/:pharmacyId" element={<PharmacyDashboard />} />
-          <Route path="/supplier/:supplierId" element={<SupplierDashboard />} />
+          {/* Legacy routes with IDs (keep for backward compatibility - DEMO MODE) */}
+          <Route path="/city" element={<CityCommandCenter />} />
+          <Route path="/hospital/:hospitalId" element={<UnifiedHospitalDashboard />} />
+          <Route path="/lab/:labId" element={<UnifiedLabDashboard />} />
+          <Route path="/pharmacy/:pharmacyId" element={<UnifiedPharmacyDashboard />} />
+          <Route path="/supplier/:supplierId" element={<UnifiedSupplierDashboard />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

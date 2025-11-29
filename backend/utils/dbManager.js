@@ -281,9 +281,41 @@ class DatabaseManager {
         };
       }
       
+      // Generate random disease statistics
+      const generateRandomCases = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+      
+      const diseaseStats = {
+        dengue: {
+          activeCases: generateRandomCases(50, 300),
+          newToday: generateRandomCases(5, 25),
+          trend: Math.random() > 0.5 ? 'increasing' : 'stable'
+        },
+        malaria: {
+          activeCases: generateRandomCases(30, 200),
+          newToday: generateRandomCases(3, 20),
+          trend: Math.random() > 0.5 ? 'increasing' : 'stable'
+        },
+        covid: {
+          activeCases: generateRandomCases(40, 250),
+          newToday: generateRandomCases(4, 22),
+          trend: Math.random() > 0.5 ? 'increasing' : 'stable'
+        },
+        typhoid: {
+          activeCases: generateRandomCases(20, 150),
+          newToday: generateRandomCases(2, 15),
+          trend: Math.random() > 0.6 ? 'stable' : 'increasing'
+        },
+        influenza: {
+          activeCases: generateRandomCases(35, 180),
+          newToday: generateRandomCases(3, 18),
+          trend: Math.random() > 0.6 ? 'stable' : 'decreasing'
+        }
+      };
+      
       // Build city object
       const city = {
         name: 'Mumbai Healthcare System',
+        diseaseStats, // Add disease statistics with random data
         totalResources: {
           beds: {
             total: summary?.totalBeds || 0,
@@ -294,13 +326,6 @@ class DatabaseManager {
           pharmacies: summary?.pharmacies || 0
         },
         activeAlerts: [],
-        diseaseStats: {
-          dengue: { activeCases: 0, newToday: 0, trend: 'stable' },
-          malaria: { activeCases: 0, newToday: 0, trend: 'stable' },
-          covid: { activeCases: 0, newToday: 0, trend: 'stable' },
-          typhoid: { activeCases: 0, newToday: 0, trend: 'stable' },
-          influenza: { activeCases: 0, newToday: 0, trend: 'stable' }
-        },
         zones
       };
 

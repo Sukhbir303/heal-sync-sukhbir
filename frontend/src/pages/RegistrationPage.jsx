@@ -53,6 +53,8 @@ function RegistrationPage() {
     setError('');
 
     try {
+      console.log('Submitting registration data:', JSON.stringify(data, null, 2));
+      
       const response = await fetch('http://localhost:4000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,13 +62,23 @@ function RegistrationPage() {
       });
 
       const result = await response.json();
+      console.log('Registration response:', JSON.stringify(result, null, 2));
 
       if (!response.ok) {
-        throw new Error(result.message || 'Registration failed');
+        const errorMsg = result.message || result.error || 'Registration failed';
+        console.error('Registration failed:', errorMsg);
+        throw new Error(errorMsg);
       }
 
       // Auto-login after registration
-      login(result.data.user, result.data.token);
+      // Merge entity data into user object for dashboard access
+      const userData = {
+        ...result.data.user,
+        entityId: result.data.entity.id,  // Add entityId to user object
+        entity: result.data.entity        // Add full entity object
+      };
+      
+      login(userData, result.data.token);
 
       // Navigate to appropriate dashboard
       const dashboardMap = {
@@ -80,6 +92,7 @@ function RegistrationPage() {
       navigate(dashboardMap[result.data.user.role] || '/');
 
     } catch (err) {
+      console.error('Registration error:', err);
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);

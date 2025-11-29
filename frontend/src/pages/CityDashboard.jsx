@@ -8,6 +8,7 @@ import CoordinationTimeline from '../components/CoordinationTimeline';
 import ImpactSummary from '../components/ImpactSummary';
 import AgentNetworkDiagram from '../components/AgentNetworkDiagram';
 import ScenarioProgress from '../components/ScenarioProgress';
+import ScenarioControlPanel from '../components/ScenarioControlPanel';
 
 function CityDashboard() {
   const { user, logout } = useAuth();
@@ -242,6 +243,9 @@ function CityDashboard() {
 
       {/* Main Content */}
       <div className="container mx-auto px-6 py-6 space-y-6">
+        {/* NEW: Enhanced Scenario Control Panel */}
+        <ScenarioControlPanel />
+
         {/* Active Scenario Progress */}
         <ScenarioProgress logs={logs} />
 
